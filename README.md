@@ -6,7 +6,8 @@ ad ranking related repo
 To implement the generative core of a system like GEM, one need to transform your ads into a "vocabulary" that a transformer model can predict. This is done via Residual Quantized Semantic IDs.
 
 1. The Mathematical Framework (RQ-KMeans)
-Instead of a random ID, an ad is represented as a sequence of discrete tokens 
+Instead of a random ID, an ad is represented as a sequence of discrete tokens
+
 [c1, c2, ..., ck]
 
 1.1 Hierarchical Decomposition: An ad embedding E is decomposed into a series of centroids.
@@ -21,6 +22,7 @@ This script demonstrates how to take high-dimensional ad embeddings (e.g., from 
 
 
 % python3 semantic_id.py
+
 Ad 0 Semantic ID: [ 7 23  3]
 Ad 0 Semantic ID: [10 23  9]
 Ad 0 Semantic ID: [10  3  3]
