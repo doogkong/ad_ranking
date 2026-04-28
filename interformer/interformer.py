@@ -386,8 +386,12 @@ class InterFormer(nn.Module):
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         tokens: List[torch.Tensor] = []
 
-        if dense_feats is not None and self.dense_proj is not None:
-            tokens.append(self.dense_proj(dense_feats).unsqueeze(1))  # [B, 1, d]
+        if self.dense_proj is not None:
+            if dense_feats is not None:
+                tokens.append(self.dense_proj(dense_feats).unsqueeze(1))  # [B, 1, d]
+            else:
+                B_cur = sparse_feats.size(0) if sparse_feats is not None else sequences.size(0)
+                tokens.append(torch.zeros(B_cur, 1, self.d, device=sequences.device))
 
         if sparse_feats is not None:
             for i, emb in enumerate(self.sparse_embeds):

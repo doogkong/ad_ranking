@@ -125,6 +125,58 @@ Traditional models often "summarize" user data too early, losing detail. InterFo
 - CLS token is initialized from X_sum^(1) (first layer's non-seq summary) before feeding to Sequence Arch (Section 4.3)
 - DCNv2 is used as the default interaction backbone
 
+### 5. Testing
+
+Run the test suite to verify the implementation:
+
+```bash
+python3 test_interformer.py
+```
+
+**Expected Output:**
+
+```
+logits shape : torch.Size([4, 1])
+loss         : 0.6023
+param count  : 832,289
+All checks passed.
+```
+
+---
+
+## Getting Started
+
+### Installation
+
+Clone the repository and install dependencies:
+
+```bash
+git clone https://github.com/doogkong/ad_ranking.git
+cd ad_ranking
+```
+
+### Running Examples
+
+To generate semantic IDs for ads:
+
+```bash
+python3 semantic_id.py
+```
+
+To test the InterFormer model:
+
+```bash
+python3 interformer/test_interformer.py
+```
+
+---
+
+## References
+
+- **InterFormer Paper**: https://arxiv.org/pdf/2411.09852
+- **RQ-KMeans Paper**: https://arxiv.org/pdf/2512.24762v1
+- **RQ-VAE Paper**: https://arxiv.org/pdf/2203.01941
+
 
 
 
