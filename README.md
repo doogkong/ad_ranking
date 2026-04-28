@@ -7,6 +7,7 @@ To implement the generative core of a system like GEM, one need to transform you
 
 1. The Mathematical Framework (RQ-KMeans)
 Instead of a random ID, an ad is represented as a sequence of discrete tokens 
+
 [c1, c2, ..., ck]
 
 1.1 Hierarchical Decomposition: An ad embedding E is decomposed into a series of centroids.
