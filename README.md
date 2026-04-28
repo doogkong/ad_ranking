@@ -21,15 +21,25 @@ This script demonstrates how to take high-dimensional ad embeddings (e.g., from 
 
 
 % python3 semantic_id.py
+
 Ad 0 Semantic ID: [ 7 23  3]
+
 Ad 0 Semantic ID: [10 23  9]
+
 Ad 0 Semantic ID: [10  3  3]
+
 Ad 0 Semantic ID: [ 7 18  3]
+
 Ad 0 Semantic ID: [ 4 23  9]
+
 Ad 0 Semantic ID: [22 18  3]
+
 Ad 0 Semantic ID: [ 5 18 26]
+
 Ad 0 Semantic ID: [20 18  4]
+
 Ad 0 Semantic ID: [22 24  9]
+
 Ad 0 Semantic ID: [15 18  8]
 
 3. Using the IDs in a Generative Model
