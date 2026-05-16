@@ -20,6 +20,26 @@ The original TokenMixer (RankMixer) has four failure modes when scaled to billio
 TokenMixer-Large addresses all four with targeted architectural changes.
 
 ---
+## Overview 
+
+  Key Ideas: TokenMixer-Large (ByteDance, Feb 2026)
+
+  Problem: The original TokenMixer (RankMixer) has four failure modes at scale:
+  1. Sub-optimal residual — mixing T tokens into H≠T new tokens breaks token semantic alignment in residuals
+  2. Impure model — legacy ops (LHUC, DCNv2) pollute MFU and memory bandwidth
+  3. Vanishing gradients in deep stacks — no mechanism to propagate signal across many layers
+  4. Inadequate MoE — "Dense Train, Sparse Infer" is expensive; relu-MoE is unpredictable at inference
+
+  Solution — three core contributions:
+
+  1. Mixing & Reverting: A symmetric two-layer reshape. Layer 1 rearranges T×D tokens into H head-tokens of size T·(D/H), applies per-head SwiGLU — enabling cross-token interaction. Layer 2 reverses the reshape and
+  applies a residual back to the original input X (not the mixed output), maintaining token semantic alignment throughout.
+  2. Inter-residual + Auxiliary Loss: Residual connections every 2–3 blocks (not just adjacent) combat vanishing gradients. Lower-layer logits are combined with final logits as a joint auxiliary loss to force lower
+  layers to learn meaningful representations.
+  3. Sparse-Pertoken MoE: "First Enlarge, Then Sparse" — expand the pertoken SwiGLU into E experts, activate top-k via softmax routing + Gate Value Scaling (α multiplier) + one always-active shared expert +
+  down-matrix small init (0.01×). Achieves 1:2 sparsity with near-zero quality drop.
+
+  Results: 7B params online (15B offline), +2% ADSS (ads), +2.98% GMV (e-commerce), +1.4% pay revenue (live streaming) at ByteDance.
 
 ## Architecture
 
