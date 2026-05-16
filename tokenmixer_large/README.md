@@ -200,21 +200,109 @@ total_loss.backward()
 
 ---
 
-## File
+## Files
 
 ```
 tokenmixer_large/
-└── tokenmixer_large.py     # full implementation + smoke test
-    ├── RMSNorm
-    ├── PertokenSwiGLU
-    ├── MixingReverting
-    ├── SparsePerTokenMoE
-    ├── TokenMixerLargeBlock
-    ├── SemanticGroupTokenizer
-    └── TokenMixerLarge
+├── tokenmixer_large.py       # full implementation + smoke test
+│   ├── RMSNorm
+│   ├── PertokenSwiGLU
+│   ├── MixingReverting
+│   ├── SparsePerTokenMoE
+│   ├── TokenMixerLargeBlock
+│   ├── SemanticGroupTokenizer
+│   └── TokenMixerLarge
+├── test_tokenmixer_large.py  # pytest test suite (42 tests)
+└── README.md
 ```
 
-Run the smoke test:
+---
+
+## Running
+
+### Smoke test
+
 ```bash
 python3 tokenmixer_large.py
+```
+
+Expected output:
+
+```
+logits:   torch.Size([4, 2])   tensor([[ 0.2164,  0.2532],
+        [-0.2668, -0.1309],
+        [-0.0556,  0.4862],
+        [ 0.4110,  0.3442]], grad_fn=<CatBackward0>)
+aux_loss: 0.0847
+params:   4,810,756
+```
+
+### Test suite
+
+```bash
+python3 -m pytest test_tokenmixer_large.py -v
+```
+
+Expected output:
+
+```
+collected 42 items
+
+test_tokenmixer_large.py::TestRMSNorm::test_output_shape PASSED
+test_tokenmixer_large.py::TestRMSNorm::test_unit_rms_after_norm PASSED
+test_tokenmixer_large.py::TestRMSNorm::test_weight_scales_output PASSED
+test_tokenmixer_large.py::TestRMSNorm::test_gradient_flows PASSED
+test_tokenmixer_large.py::TestPertokenSwiGLU::test_output_shape PASSED
+test_tokenmixer_large.py::TestPertokenSwiGLU::test_pertoken_independence PASSED
+test_tokenmixer_large.py::TestPertokenSwiGLU::test_small_init_wdown_magnitude PASSED
+test_tokenmixer_large.py::TestPertokenSwiGLU::test_small_init_near_identity PASSED
+test_tokenmixer_large.py::TestPertokenSwiGLU::test_gradient_flows PASSED
+test_tokenmixer_large.py::TestMixingReverting::test_output_shape PASSED
+test_tokenmixer_large.py::TestMixingReverting::test_dim_not_divisible_raises PASSED
+test_tokenmixer_large.py::TestMixingReverting::test_residual_to_original_x PASSED
+test_tokenmixer_large.py::TestMixingReverting::test_different_heads PASSED
+test_tokenmixer_large.py::TestMixingReverting::test_gradient_flows PASSED
+test_tokenmixer_large.py::TestMixingReverting::test_moe_factory PASSED
+test_tokenmixer_large.py::TestSparsePerTokenMoE::test_output_shape PASSED
+test_tokenmixer_large.py::TestSparsePerTokenMoE::test_gate_weights_sum_to_one PASSED
+test_tokenmixer_large.py::TestSparsePerTokenMoE::test_top_k_experts_selected PASSED
+test_tokenmixer_large.py::TestSparsePerTokenMoE::test_gate_scale_effect PASSED
+test_tokenmixer_large.py::TestSparsePerTokenMoE::test_shared_expert_always_active PASSED
+test_tokenmixer_large.py::TestSparsePerTokenMoE::test_top_k_equals_num_experts PASSED
+test_tokenmixer_large.py::TestSparsePerTokenMoE::test_gradient_flows PASSED
+test_tokenmixer_large.py::TestTokenMixerLargeBlock::test_output_shape PASSED
+test_tokenmixer_large.py::TestTokenMixerLargeBlock::test_residual_preserves_scale PASSED
+test_tokenmixer_large.py::TestTokenMixerLargeBlock::test_gradient_flows_through_both_sublayers PASSED
+test_tokenmixer_large.py::TestSemanticGroupTokenizer::test_output_shape PASSED
+test_tokenmixer_large.py::TestSemanticGroupTokenizer::test_global_token_prepended PASSED
+test_tokenmixer_large.py::TestSemanticGroupTokenizer::test_num_tokens_attribute PASSED
+test_tokenmixer_large.py::TestSemanticGroupTokenizer::test_global_token_shared_across_batch PASSED
+test_tokenmixer_large.py::TestSemanticGroupTokenizer::test_different_groups_get_different_mlps PASSED
+test_tokenmixer_large.py::TestSemanticGroupTokenizer::test_gradient_flows PASSED
+test_tokenmixer_large.py::TestTokenMixerLarge::test_output_shapes PASSED
+test_tokenmixer_large.py::TestTokenMixerLarge::test_single_task PASSED
+test_tokenmixer_large.py::TestTokenMixerLarge::test_aux_loss_none_when_disabled PASSED
+test_tokenmixer_large.py::TestTokenMixerLarge::test_aux_loss_positive PASSED
+test_tokenmixer_large.py::TestTokenMixerLarge::test_no_inter_residual PASSED
+test_tokenmixer_large.py::TestTokenMixerLarge::test_backward_through_total_loss PASSED
+test_tokenmixer_large.py::TestTokenMixerLarge::test_deterministic_with_seed PASSED
+test_tokenmixer_large.py::TestTokenMixerLarge::test_different_inputs_different_outputs PASSED
+test_tokenmixer_large.py::TestTokenMixerLarge::test_many_feature_groups PASSED
+test_tokenmixer_large.py::TestTokenMixerLarge::test_single_layer_no_inter_residual PASSED
+test_tokenmixer_large.py::TestTokenMixerLarge::test_grad_exists_for_all_parameters PASSED
+
+42 passed in 0.89s
+```
+
+Useful variants:
+
+```bash
+# Run a single test class
+python3 -m pytest test_tokenmixer_large.py::TestSparsePerTokenMoE -v
+
+# Run a single test
+python3 -m pytest test_tokenmixer_large.py::TestTokenMixerLarge::test_backward_through_total_loss -v
+
+# Stop on first failure
+python3 -m pytest test_tokenmixer_large.py -x
 ```
