@@ -16,9 +16,9 @@ Paper: https://arxiv.org/abs/2502.18965
 
   | Component | What it does |
   |---|---|
-  |Encoder-Decoder (T5-style + MoE)     │ Encoder encodes user history H_u; Decoder autoregressively generates a full session S = {v₁,...,v_m} as semantic token sequences   |    
-  │ Session-wise generation              │ Generates an entire session (5 items) at once instead of next-item point-by-point — captures intra-session coherence and diversity              │
-  │ Iterative Preference Alignment (IPA) │ Trains a reward model (swt/vtr/ltr towers), generates N=128 candidates via beam search per user, picks winner/loser pair, applies DPO; iterates │
+  | **Encoder-Decoder (T5-style + MoE) **    │ Encoder encodes user history H_u; Decoder autoregressively generates a full session S = {v₁,...,v_m} as semantic token sequences   |    
+  │ **Session-wise generation   **           │ Generates an entire session (5 items) at once instead of next-item point-by-point — captures intra-session coherence and diversity              │
+  │ ** Iterative Preference Alignment (IPA) **│ Trains a reward model (swt/vtr/ltr towers), generates N=128 candidates via beam search per user, picks winner/loser pair, applies DPO; iterates │
   
   Semantic tokenization: item embeddings → Balanced K-means residual quantization (L=3 levels, K=8192 codebook) → each item gets L integer codes. Balanced assignment avoids the hourglass phenomenon of standard
   RQ-VAE.
