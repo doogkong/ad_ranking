@@ -8,6 +8,27 @@ Paper: https://arxiv.org/abs/2502.18965
 
 ## Key Ideas
 
+### summary
+
+  Summary
+
+  OneRec (KuaiShou, Feb 2025) replaces the traditional 4-stage cascade (Retrieval → Pre-ranking → Ranking → Re-ranking) with a single unified generative model. Three key ideas:
+
+  ┌──────────────────────────────────────┬─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │              Component               │                                                                  What it does                                                                   │
+  ├──────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ Encoder-Decoder (T5-style + MoE)     │ Encoder encodes user history H_u; Decoder autoregressively generates a full session S = {v₁,...,v_m} as semantic token sequences                │
+  ├──────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ Session-wise generation              │ Generates an entire session (5 items) at once instead of next-item point-by-point — captures intra-session coherence and diversity              │
+  ├──────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ Iterative Preference Alignment (IPA) │ Trains a reward model (swt/vtr/ltr towers), generates N=128 candidates via beam search per user, picks winner/loser pair, applies DPO; iterates │
+  └──────────────────────────────────────┴─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+  Semantic tokenization: item embeddings → Balanced K-means residual quantization (L=3 levels, K=8192 codebook) → each item gets L integer codes. Balanced assignment avoids the hourglass phenomenon of standard
+  RQ-VAE.
+
+  Online results at Kuaishou: +1.68% total watch time, +6.56% average view duration vs. full multi-stage system.
+
 ### Problem: cascade ranking has a ceiling
 
 Traditional recommenders chain Retrieval → Pre-ranking → Ranking → Re-ranking. Each stage acts as an upper bound for the next; no stage can recover items discarded upstream. Each ranker is trained independently, so the overall system is suboptimal.
