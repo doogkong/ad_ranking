@@ -2,7 +2,7 @@
 
 PyTorch reference implementations for:
 
-- **`llm_retrieval.py`** — "LLM Retrieval for Stable and Predictable Ad Recommendations" (Meta Platforms, SIGIR Workshop AgentSearch 2026), arXiv: 2605.21969v1
+- **`llm_retrieval.py`** — "LLM Retrieval for Stable and Predictable Ad Recommendations (https://arxiv.org/pdf/2605.21969)" (Meta Platforms, SIGIR Workshop AgentSearch 2026), arXiv: 2605.21969v1
 - **`llm_ranking.py`** — Extension of the above to the ranking stage, combining with the Foundation-Expert paradigm (arXiv: 2508.02929)
 
 ---
