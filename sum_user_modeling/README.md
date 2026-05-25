@@ -2,7 +2,7 @@
 
 PyTorch reference implementation of:
 
-- **`sum_model.py`** — "Scaling User Modeling: Large-scale Online User Representations for Ads Personalization in Meta" (Meta Platforms, arXiv 2311.09544v2)
+- **`sum_model.py`** — "Scaling User Modeling: Large-scale Online User Representations for Ads Personalization in Meta" (Meta Platforms,https://arxiv.org/pdf/2311.09544,  arXiv 2311.09544v2)
 
 ---
 
