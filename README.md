@@ -56,6 +56,7 @@ Frameworks for transferring a large, separately-trained foundation model's knowl
 |---|---|---|---|
 | [`ExFM`](ExFM) | [External Large Foundation Model](https://arxiv.org/abs/2502.17494) (Meta AI) | Feb 2025 | External distillation + a Data Augmentation Service that amortizes FM inference across VMs; an Auxiliary Head (with Gradient/Label Scaling) to reduce cross-domain bias transfer; a Student Adapter to close the FM-VM freshness gap. |
 | [`LoopFM`](LoopFM) | [LoopFM](https://arxiv.org/abs/2605.29280) (Meta AI) | May 2026 | Opens a second, high-bandwidth transfer channel beyond scalar KD: materializes the FM's own historical embeddings as a user-keyed input sequence for the VM (Matryoshka-compressed, INT4-quantized), roughly doubling the FM→VM transfer ratio. |
+| [`Rec-Distill`](Rec-Distill) | [Rec-Distill](https://arxiv.org/abs/2605.29755) (ByteDance AML) | May 2026 | A decoupled "1-to-N" teacher-student distillation pipeline: a black-box CE distillation loss, a fault-isolated decoupled-tower student, and a sampling-aware cross-debias correction for when teacher/student are sampled differently. Scales teachers to 24B params / 20K-length sequences with >60% transferability. |
 | [`sum_user_modeling`](sum_user_modeling) | [Scaling User Modeling](https://arxiv.org/pdf/2311.09544) (Meta Platforms) | Nov 2023 | Large-scale, reusable online user representations shared across many downstream ads-personalization models. |
 
 ---
