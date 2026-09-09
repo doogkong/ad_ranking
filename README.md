@@ -1,182 +1,78 @@
 # AD Ranking
 
-Ad ranking research repository implementing generative recommendation and discriminative ranking approaches.
+Ad ranking research repository: PyTorch reference implementations of papers on large-scale ranking/retrieval architectures, generative recommenders, semantic-ID tokenization, and foundation-model-to-vertical-model (FM→VM) knowledge transfer for industrial ads/recommendation systems.
+
+Every paper implementation lives in its own folder with the same three-part structure: `<name>.py` (the implementation + a runnable smoke test), `test_<name>.py` (a pytest suite), and `README.md` (the paper's key ideas, equations, and usage). See `PROPOSAL.md` for the broader technical proposal this repo supports.
 
 ---
 
-## Generative Ads Recommendation with Semantic ID
+## Contents
 
-To implement the generative core of a system like GEM, ads are transformed into a "vocabulary" that a transformer model can predict using Residual Quantized Semantic IDs.
+### Feature-interaction ranking architectures
 
-### 1. Mathematical Framework (RQ-KMeans)
+Models whose core contribution is *how* to cross/combine heterogeneous ranking features efficiently at scale.
 
-Instead of a random ID, an ad is represented as a sequence of discrete tokens:
+| Folder | Paper | Summary |
+|---|---|---|
+| [`interformer`](interformer) | [InterFormer](https://arxiv.org/abs/2411.09852) (UIUC + Meta AI) | Bidirectional heterogeneous interaction between non-sequential features and behavior sequences via three mutually-reinforcing "arches," incl. a Personalized FFN. Deployed at Meta Ads: +0.15% NE, +24% QPS. |
+| [`RankMixer`](RankMixer) | [RankMixer](https://arxiv.org/abs/2507.15551) (ByteDance) | Replaces self-attention with parameter-free multi-head token mixing + per-token FFNs (optionally Sparse-MoE) for a hardware-aligned, highly-parallel ranking backbone. Scaled to 1.1B params on Douyin at flat latency. |
+| [`tokenmixer_large`](tokenmixer_large) | [TokenMixer-Large](https://arxiv.org/abs/2602.06563) (ByteDance) | RankMixer's successor: fixes sub-optimal residuals, adds inter-residual connections + auxiliary loss, and a sparser "enlarge-then-sparsify" MoE for stable scaling to billions of parameters. |
+| [`wukong`](wukong) | [Wukong](https://arxiv.org/abs/2403.02545) (Meta AI) | Stacks Factorization-Machine and Linear-Compress blocks (following DHEN) to establish a scaling law for feature-interaction models. |
+| [`kunlun`](kunlun) | [Kunlun](https://arxiv.org/abs/2602.10016) (Meta Platforms) | A unified architecture design establishing scaling laws for massive-scale recommenders; +1.2% NE and 2x scaling efficiency over InterFormer at Meta Ads. |
+| [`meta_lattice`](meta_lattice) | [Meta Lattice](https://arxiv.org/abs/2512.09200) (Meta Platforms) | Redesigns the ranking model's space for cost-effective scaling; +10% topline NE, +20% capacity savings at Meta Ads. |
+| [`foundation_expert`](foundation_expert) | [Foundation-Expert Paradigm](https://arxiv.org/abs/2508.02929) (Meta AI) | Splits a hyperscale model into a shared Foundation backbone plus lightweight per-surface Experts, transferring knowledge FM-to-Expert at latency parity. Deployed across Feed, Reels, Groups, etc. |
+| [`pepnet`](pepnet) | [PEPNet](https://arxiv.org/abs/2302.01115) (Kuaishou, KDD 2023) | Parameter- and Embedding-Personalized gating network that infuses personalized prior information into a shared multi-domain/multi-task backbone. Deployed at Kuaishou (300M DAU). |
+| [`onetrans`](onetrans) | [OneTrans](https://arxiv.org/abs/2510.26104) (ByteDance / NTU, WWW 2026) | Unifies feature interaction and user-sequence modeling into a single Transformer backbone instead of separate modules. |
 
-```
-[c1, c2, ..., ck]
-```
+### Generative & sequential recommenders
 
-#### 1.1 Hierarchical Decomposition
-An ad embedding E is decomposed into a series of centroids.
+Models that reframe ranking/retrieval as sequence generation over discrete item tokens.
 
-#### 1.2 Residual Learning
-- **c1**: Represents the coarse category
-- **c2**: Represents the detail within that category by quantizing the residual (the difference between E and the first centroid)
+| Folder | Paper | Summary |
+|---|---|---|
+| [`HSTU`](HSTU) | [Actions Speak Louder than Words](https://arxiv.org/abs/2402.17152) (Meta AI, NeurIPS-style) | Hierarchical Sequential Transduction Units: replaces softmax attention with pointwise-aggregated attention + relative position/time bias for trillion-parameter Generative Recommenders. Includes Stochastic Length and M-FALCON-style cached candidate scoring. |
+| [`TIGER`](TIGER) | [Recommender Systems with Generative Retrieval](https://arxiv.org/abs/2305.05065) (Google DeepMind / UW-Madison, NeurIPS 2023) | Assigns items hierarchical Semantic IDs via RQ-VAE, then trains a seq2seq Transformer to autoregressively generate the next item's Semantic ID — enabling cold-start retrieval and tunable diversity. |
+| [`semantic_id`](semantic_id) | [RQ-KMeans](https://arxiv.org/pdf/2512.24762v1) / [RQ-VAE](https://arxiv.org/pdf/2203.01941) | The residual-quantization tokenization technique underlying TIGER/GR2: turns item embeddings into short, hierarchical, discrete Semantic ID sequences. |
+| [`onerec`](onerec) | [OneRec](https://arxiv.org/abs/2502.18965) (KuaiShou, Feb 2025) | Unifies retrieval and ranking into one generative recommender with preference alignment (RLHF-style) on top. |
 
-**Objective**: Ensures that ads with similar IDs are semantically similar, allowing the model to predict relevant ads by predicting the next ID token.
+### LLM-based retrieval, ranking & re-ranking
 
-### 2. Python Implementation: Semantic ID Generator
+Using large language models directly in the recommendation pipeline.
 
-This script transforms high-dimensional ad embeddings (e.g., from vision or text models) into 3-level semantic sequences.
+| Folder | Paper | Summary |
+|---|---|---|
+| [`llm_ads`](llm_ads) | [LLM Retrieval](https://arxiv.org/pdf/2605.21969) (Meta, SIGIR Workshop AgentSearch 2026) + ranking extension | LLM semantic features for stable/predictable ad retrieval, extended to the ranking stage combined with the Foundation-Expert paradigm. |
+| [`GR2`](GR2) | [GR2 Technical Report](https://arxiv.org/abs/2606.31984) (Meta AI, Jul 2026) | Generative Reasoning Re-Ranker: Semantic-ID mid-training, teacher-distilled chain-of-thought reasoning (SFT / On-Policy Distillation), and DAPO-based RL with a de-hacked verifiable reward for LLM-based re-ranking. +18.7% R@1 on industrial traffic. |
 
-#### Usage
+### Foundation-model-to-VM transfer frameworks
 
-```bash
-python3 semantic_id.py
-```
+Frameworks for transferring a large, separately-trained foundation model's knowledge into the small vertical models that actually serve traffic, under strict latency/streaming-data constraints.
 
-#### Example Output
-
-```
-Ad 0 Semantic ID: [ 7 23  3]
-Ad 0 Semantic ID: [10 23  9]
-Ad 0 Semantic ID: [10  3  3]
-Ad 0 Semantic ID: [ 7 18  3]
-Ad 0 Semantic ID: [ 4 23  9]
-Ad 0 Semantic ID: [22 18  3]
-Ad 0 Semantic ID: [ 5 18 26]
-Ad 0 Semantic ID: [20 18  4]
-Ad 0 Semantic ID: [22 24  9]
-Ad 0 Semantic ID: [15 18  8]
-```
-
-### 3. Using the IDs in a Generative Model
-
-Once sequences are generated, the recommendation task becomes a Language Modeling problem.
-
-- **Input**: User history tokens + Context tokens
-- **Output**: Next-token prediction for the Ad ID sequence
-- **Inference**: Use Beam Search to find the top-N most probable sequences, then map back to actual Ads in the database
-
-### 4. Key Implementation Steps
-
-#### 4.1 Warm-up
-Train the quantization (KMeans) on your entire ad corpus once.
-
-#### 4.2 Fine-tuning
-Train a Transformer (like a small Llama or GPT) where the "vocabulary" is the union of all k cluster indices.
-
-#### 4.3 Cross-Entropy Loss
-Optimize the model to predict the ground-truth semantic ID of ads that users previously converted on.
-
-### 5. Representative Algorithms
-
-#### 5.1 RQ-KMeans
-**Residual Quantization K-Means** — Algorithm-driven approach (clustering)
-- Faster to train
-- Stable and decouples tokenizer from recommendation model
-- Reference: https://arxiv.org/pdf/2512.24762v1
-
-#### 5.2 RQ-VAE
-**Residual-Quantized Variational Autoencoder** — Model-driven approach (learning)
-- Often produces lower reconstruction error
-- More complex to train with potential training instability
-- Reference: https://arxiv.org/pdf/2203.01941
-
-
----
-
-## InterFormer
-
-InterFormer is a discriminative ranking module designed to improve Click-Through Rate (CTR) prediction by better modeling how different types of data interact.
-
-**Paper**: https://arxiv.org/pdf/2411.09852
-
-### 1. The Core Problem InterFormer Solves
-
-Traditional models often "summarize" user data too early, losing detail. InterFormer uses three specific "Arches" to keep information intact until the very end:
-
-- **Global Arch**: Processes static "non-sequence" data (e.g., user age, location)
-- **Sequence Arch**: Processes "dynamic" behavioral data (e.g., past clicks, searches)
-- **Bridging Arch**: Acts as a highway between the two, allowing them to communicate in every layer without losing detail
-
-### 2. Files & Implementation
-
-**Files created:**
-- `interformer/interformer.py` — Full model implementation (~430 lines)
-- `interformer/test_interformer.py` — Unit tests for each component
-
-### 3. Architecture (Section 4 of Paper)
-
-| Component | Purpose |
-|-----------|---------|
-| **MaskNet** | Unifies k behavior sequences via self-masking (eq. 6) |
-| **CrossArch** | Computes X_sum (non-seq → seq) and S_sum (seq → non-seq) via self-gating (eq. 10–11) |
-| **PoolingByMHA** | PMA: summarizes sequence with learnable query tokens (eq. 4) |
-| **PFFN** | Personalised FFN: modulates sequence by non-seq context f(X_sum) * S (eq. 8) |
-| **SequenceArch** | S^(l+1) = MHA(PFFN(X_sum, S)) (eq. 9) |
-| **InteractionArch** | X^(l+1) = MLP(DCNv2([X ‖ S_sum])) with residual (eq. 7) |
-| **InterFormerBlock** | One interleaving layer combining all three arches |
-| **InterFormer** | Full model: preprocessing → CLS prepend → L blocks → classifier head |
-
-### 4. Key Design Choices
-
-- Dense/sparse non-seq features are embedded to d-dimensional tokens
-- CLS token is initialized from X_sum^(1) (first layer's non-seq summary) before feeding to Sequence Arch (Section 4.3)
-- DCNv2 is used as the default interaction backbone
-
-### 5. Testing
-
-Run the test suite to verify the implementation:
-
-```bash
-python3 test_interformer.py
-```
-
-**Expected Output:**
-
-```
-logits shape : torch.Size([4, 1])
-loss         : 0.6023
-param count  : 832,289
-All checks passed.
-```
+| Folder | Paper | Summary |
+|---|---|---|
+| [`ExFM`](ExFM) | [External Large Foundation Model](https://arxiv.org/abs/2502.17494) (Meta AI, Jul 2025) | External distillation + a Data Augmentation Service that amortizes FM inference across VMs; an Auxiliary Head (with Gradient/Label Scaling) to reduce cross-domain bias transfer; a Student Adapter to close the FM-VM freshness gap. |
+| [`LoopFM`](LoopFM) | [LoopFM](https://arxiv.org/abs/2605.29280) (Meta AI, Jun 2026) | Opens a second, high-bandwidth transfer channel beyond scalar KD: materializes the FM's own historical embeddings as a user-keyed input sequence for the VM (Matryoshka-compressed, INT4-quantized), roughly doubling the FM→VM transfer ratio. |
+| [`sum_user_modeling`](sum_user_modeling) | [Scaling User Modeling](https://arxiv.org/pdf/2311.09544) (Meta Platforms) | Large-scale, reusable online user representations shared across many downstream ads-personalization models. |
 
 ---
 
 ## Getting Started
-
-### Installation
-
-Clone the repository and install dependencies:
 
 ```bash
 git clone https://github.com/doogkong/ad_ranking.git
 cd ad_ranking
 ```
 
-### Running Examples
-
-To generate semantic IDs for ads:
+Every implementation is self-contained (PyTorch only, except `semantic_id/` which uses `scikit-learn`). From any paper's folder:
 
 ```bash
-python3 semantic_id.py
-```
-
-To test the InterFormer model:
-
-```bash
-python3 interformer/test_interformer.py
+cd HSTU                        # or any other folder
+python3 hstu.py                # runs a smoke test end-to-end
+python3 -m pytest test_hstu.py -v   # runs the full test suite
 ```
 
 ---
 
 ## References
 
-- **InterFormer Paper**: https://arxiv.org/pdf/2411.09852
-- **RQ-KMeans Paper**: https://arxiv.org/pdf/2512.24762v1
-- **RQ-VAE Paper**: https://arxiv.org/pdf/2203.01941
-
-
-
-
+Each folder's `README.md` links directly to its paper; see the tables above for the full list.
