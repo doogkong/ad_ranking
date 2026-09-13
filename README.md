@@ -38,6 +38,7 @@ Models that reframe ranking/retrieval as sequence generation over discrete item 
 | [`TIGER`](TIGER) | [Recommender Systems with Generative Retrieval](https://arxiv.org/abs/2305.05065) (Google DeepMind / UW-Madison, NeurIPS 2023) | May 2023 | Assigns items hierarchical Semantic IDs via RQ-VAE, then trains a seq2seq Transformer to autoregressively generate the next item's Semantic ID — enabling cold-start retrieval and tunable diversity. |
 | [`semantic_id`](semantic_id) | [RQ-KMeans](https://arxiv.org/pdf/2512.24762v1) / [RQ-VAE](https://arxiv.org/pdf/2203.01941) | Dec 2025 / Mar 2022 | The residual-quantization tokenization technique underlying TIGER/GR2: turns item embeddings into short, hierarchical, discrete Semantic ID sequences. |
 | [`onerec`](onerec) | [OneRec](https://arxiv.org/abs/2502.18965) (KuaiShou) | Feb 2025 | Unifies retrieval and ranking into one generative recommender with preference alignment (RLHF-style) on top. |
+| [`PinRec`](PinRec) | [PinRec](https://arxiv.org/abs/2504.10507) (Pinterest, KDD 2026) | Apr 2025 | Unified generative retrieval model for all Pinterest surfaces via Outcome-Conditioned Generation (steer output toward a surface's target action) plus cross-surface pretrain/fine-tune with impression negatives. Multi-step outcome-conditioned generation needs budget allocation + embedding compression at retrieval time. +4% search saves, +71.4% recall from 16-step generation. |
 
 ### LLM-based retrieval, ranking & re-ranking
 
