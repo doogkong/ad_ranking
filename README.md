@@ -39,6 +39,7 @@ Models that reframe ranking/retrieval as sequence generation over discrete item 
 | [`semantic_id`](semantic_id) | [RQ-KMeans](https://arxiv.org/pdf/2512.24762v1) / [RQ-VAE](https://arxiv.org/pdf/2203.01941) | Dec 2025 / Mar 2022 | The residual-quantization tokenization technique underlying TIGER/GR2: turns item embeddings into short, hierarchical, discrete Semantic ID sequences. |
 | [`onerec`](onerec) | [OneRec](https://arxiv.org/abs/2502.18965) (KuaiShou) | Feb 2025 | Unifies retrieval and ranking into one generative recommender with preference alignment (RLHF-style) on top. |
 | [`PinRec`](PinRec) | [PinRec](https://arxiv.org/abs/2504.10507) (Pinterest, KDD 2026) | Apr 2025 | Unified generative retrieval model for all Pinterest surfaces via Outcome-Conditioned Generation (steer output toward a surface's target action) plus cross-surface pretrain/fine-tune with impression negatives. Multi-step outcome-conditioned generation needs budget allocation + embedding compression at retrieval time. +4% search saves, +71.4% recall from 16-step generation. |
+| [`UniPinRec`](UniPinRec) | [UniPinRec](https://arxiv.org/abs/2606.00422) (Pinterest) | Jun 2026 | Unifies retrieval AND ranking into one PinRec-based model: Masked Action Modeling adds ranking supervision to the non-interleaved retrieval sequence without inflating context length, and cross-stage KV-cache reuse lets ranking decode from retrieval's cached history instead of re-encoding it. +14.8% ranking Hit@3, >3x forward-pass speedup, -11.1% e2e latency. |
 
 ### LLM-based retrieval, ranking & re-ranking
 
