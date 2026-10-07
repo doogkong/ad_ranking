@@ -1,6 +1,6 @@
 # AD Ranking
 
-Ad ranking research repository: PyTorch reference implementations of papers on large-scale ranking/retrieval architectures, generative recommenders, semantic-ID tokenization, and foundation-model-to-vertical-model (FM→VM) knowledge transfer for industrial ads/recommendation systems.
+Ad ranking research repository: PyTorch reference implementations of papers on large-scale ranking/retrieval architectures, generative recommenders, semantic-ID tokenization, and foundation-model-to-vertical-model (FM→VM) knowledge transfer for industrial ads/recommendation systems, plus reference designs of autonomous ML-engineering agents.
 
 Every paper implementation lives in its own folder with the same three-part structure: `<name>.py` (the implementation + a runnable smoke test), `test_<name>.py` (a pytest suite), and `README.md` (the paper's key ideas, equations, and usage). See `PROPOSAL.md` for the broader technical proposal this repo supports.
 
@@ -65,6 +65,14 @@ Frameworks for transferring a large, separately-trained foundation model's knowl
 | [`Rec-Distill`](Rec-Distill) | [Rec-Distill](https://arxiv.org/abs/2605.29755) (ByteDance AML) | May 2026 | A decoupled "1-to-N" teacher-student distillation pipeline: a black-box CE distillation loss, a fault-isolated decoupled-tower student, and a sampling-aware cross-debias correction for when teacher/student are sampled differently. Scales teachers to 24B params / 20K-length sequences with >60% transferability. |
 | [`sum_user_modeling`](sum_user_modeling) | [Scaling User Modeling](https://arxiv.org/pdf/2311.09544) (Meta Platforms) | Nov 2023 | Large-scale, reusable online user representations shared across many downstream ads-personalization models. |
 
+### Autonomous ML-engineering agents
+
+Systems that automate the *development* of ranking models (hypothesis → experiment → debug → iterate) rather than the model architecture itself. These are agent systems, not neural networks, so the implementations are dependency-free reference designs with a simulated training cluster.
+
+| Folder | Source | Date | Summary |
+|---|---|---|---|
+| [`REA`](REA) | [Ranking Engineer Agent (REA)](https://engineering.fb.com/2026/03/17/developer-tools/ranking-engineer-agent-rea-autonomous-ai-system-accelerating-meta-ads-ranking-innovation/) (Meta Engineering blog post) | Mar 2026 | Autonomous agent that runs the end-to-end ML-experimentation lifecycle over multi-week workflows: a hibernate-and-wake executor (checkpoint and resume across long training jobs), a dual-source hypothesis engine (historical insights DB + ML research agent), three-phase planning (Validation → Combination → Exploitation) inside an engineer-approved compute budget, and a failure runbook that adapts within guardrails. 2x model accuracy over baseline across six models; 5x engineering output. The post discloses no code, so this is a reference design of the described architecture; see the folder README for what is and isn't specified. |
+
 ---
 
 ## Getting Started
@@ -74,7 +82,7 @@ git clone https://github.com/doogkong/ad_ranking.git
 cd ad_ranking
 ```
 
-Every implementation is self-contained (PyTorch only, except `semantic_id/` which uses `scikit-learn`). From any paper's folder:
+Every implementation is self-contained (PyTorch only, except `semantic_id/` which uses `scikit-learn` and `REA/` which uses only the Python standard library). From any paper's folder:
 
 ```bash
 cd HSTU                        # or any other folder
